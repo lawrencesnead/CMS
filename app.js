@@ -28,8 +28,10 @@ const start = async function () {
                     removeEmployee();
                     break;
                 case "Update Employee Role":
+                    updateEmployeeRole();
                     break;
                 case "Update Employee Manager":
+                    updateEmployeeManager();
                     break;
                 case "View All Roles":
                     viewAllRoles();
@@ -109,8 +111,6 @@ const addEmployee = async function () {
 };
 
 const addDepartment = async function () {
-    let choices = await selectAllEmployees();
-    let roles = await selectAllRoles();
     await inquirer
         .prompt({
             type: "input",
@@ -124,6 +124,19 @@ const addDepartment = async function () {
         });
 };
 
+const removeDepartment = async function () {
+    let choices = await selectAllDepartments();
+    await inquirer
+        .prompt([{
+            type: "list",
+            name: "department",
+            message: "Which department would you like to remove?",
+            choices: choices
+        },
+        ])
+    .then(orm.deleteDepartment(answers.department))
+};
+
 const removeEmployee = async function () {
     let choices = await selectAllEmployees();
     await inquirer
@@ -135,6 +148,58 @@ const removeEmployee = async function () {
         },
         ])
     .then(orm.deleteEmployee(answers.employee))
+};
+
+const removeRole = async function () {
+    let choices = await selectAllRoles();
+    await inquirer
+        .prompt([{
+            type: "list",
+            name: "role",
+            message: "Which role would you like to remove?",
+            choices: choices
+        },
+        ])
+    .then(orm.deleteRole(answers.role))
+};
+
+const updateEmployeeRole = async function () {
+    let choices = selectAllEmployees();
+    let roles = selectAllRoles();
+    await inquirer
+        .prompt([{
+            type: "rawlist",
+            name: "employee",
+            message: "Which employee would you like to update the role for?",
+            choices: choices
+        },
+        {
+            type: "rawlist",
+            name: "role",
+            message: "Which role should it be updated to?",
+            choices: roles
+        },
+        ])
+    .then(orm.updateEmployeeRole(answers))
+};
+
+const updateEmployeeManager = async function () {
+    let choices = selectAllEmployees();
+    await inquirer
+        .prompt([{
+            type: "rawlist",
+            name: "employee",
+            message: "Which employee would you like to update the manager for?",
+            choices: choices
+        },
+        {
+            type: "rawlist",
+            name: "manager",
+            message: "Who is their new manager?",
+            choices: choices
+        },
+        ])
+    .then(orm.updateEmployeeManager(answers))
 };
 
 const addRole = async function () {
@@ -159,7 +224,6 @@ const addRole = async function () {
         ])
     .then(orm.addRole(answers))
 };
-
 
 const viewAllEmployees = function () {
     

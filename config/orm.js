@@ -38,19 +38,64 @@ var orm = {
     });
   },
   
+  addEmployee: function (employee) {
+    var queryString = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (??, ??, ??, ??)`;
+
+    connection.query(queryString, [employee.firstname, employee.lastname, employee.role_id, employee.manager_id], function (err, result) {
+      if (err) throw err;
+      console.log(result.affectedRows + " employee has been added here!");
+    });
+  },
+
   deleteEmployee: function (person) {
-    var queryString = "DELETE FROM employee WHERE employee.id = ??";
+    var queryString = "DELETE FROM employee WHERE id = ??";
 
     connection.query(queryString, [person.id], function (err, result) {
       if (err) throw err;
       console.log(result.affectedRows + " has been removed!")
     });
   },
+
+  deleteRole: function (role) {
+    var queryString = "DELETE FROM role WHERE id = ??";
+
+    connection.query(queryString, [role.id], function (err, result) {
+      if (err) throw err;
+      console.log(result.affectedRows + " has been removed!")
+    });
+  },
+
+  deleteDepartment: function (data) {
+    var queryString = "DELETE FROM department WHERE id = ??";
+
+    connection.query(queryString, [data.id], function (err, result) {
+      if (err) throw err;
+      console.log(result.affectedRows + " has been removed!")
+    });
+  },
   
-  addRole: function (role) {
+  updateEmployeeRole: function (data) {
+    var queryString = `UPDATE employee SET role_id = ?? WHERE id = ??`;
+
+    connection.query(queryString, [data.role.id, data.employee.id], function (err, result) {
+      if (err) throw err;
+      console.log(result.affectedRows + " has been updated!");
+    });
+  },
+
+  updateEmployeeManager: function (data) {
+    var queryString = `UPDATE employee SET manager_id = ?? WHERE id = ??`;
+
+    connection.query(queryString, [data.manager.id, data.employee.id], function (err, result) {
+      if (err) throw err;
+      console.log(result.affectedRows + " has been updated!");
+    });
+  },
+  
+  addEmployeeRole: function (data) {
     var queryString = `INSERT INTO role (title, salary, department) VALUES (??, ??, ??)`;
 
-    connection.query(queryString, [role.title, role.salary, role.department], function (err, result) {
+    connection.query(queryString, [data.role, data.salary, data.department.id], function (err, result) {
       if (err) throw err;
       console.log(result.affectedRows + " role has been added!");
     });
@@ -65,23 +110,7 @@ var orm = {
     });
   },
   
-  addEmployee: function (employee) {
-    var queryString = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (??, ??, ??, ??)`;
-
-    connection.query(queryString, [employee.firstname, employee.lastname, employee.role_id, employee.manager_id], function (err, result) {
-      if (err) throw err;
-      console.log(result + " employee has been added!");
-    });
-  },
-  
-  getID: function (employee) {
-    let fullName = employee.split(" ");
-    var queryString = `SELECT * FROM employee WHERE employee.first_name = ?? && employee.last_name = ??`
-    connection.query(queryString, [fullName[0], fullName[1]], function (err, result) {
-      if (err) throw err;
-      console.log(result + " id");
-    });
-  }
+ 
 };
 
 module.exports = orm;
