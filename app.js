@@ -5,6 +5,7 @@ var connection = require("./config/connection");
 
 
 
+
 const start = function () {
     inquirer
         .prompt([{
@@ -80,9 +81,24 @@ const selectAllDepartments = function () {
     });
 };
 
-const addEmployee = function () {
-    let choices = selectAllEmployees();
-    let roles = selectAllRoles();
+const addEmployee =  function () {
+    var queryString = "SELECT * FROM employee";
+    let employees, roles;
+    
+    connection.query(queryString, function (err, result) {
+        if (err) throw err;
+        employees = result.forEach(employee => employee.first_name + " " + employee.last_name);
+        console.log(employees);
+        
+    });
+    
+    var queryString2 = "SELECT * FROM role AS role";
+    
+    connection.query(queryString2, function (err, result) {
+      if (err) throw err;
+        roles = result.forEach(role => role.title);
+        console.log(roles);
+    });
     inquirer
         .prompt([{
             type: "input",
@@ -94,17 +110,17 @@ const addEmployee = function () {
             name: "lastname",
             message: "What is the last name?"
         },
-        {
-            type: "list",
-            name: "role",
-            message: "What is the employee's role?",
-            choices: [roles]
+            {
+                type: "list",
+                name: "role",
+                message: "What is the employee's role?",
+                choices: [{roles}]
         },
         {
             type: "list",
             name: "manager",
             message: "Who is the employee's manager?",
-            choices: [choices]
+            choices: [{ employees }]
         },
         ])
         .then(function (answers) {
@@ -256,7 +272,7 @@ const viewAllEmployees = function () {
 };
 
 const viewAllRoles = function () {
-    var queryString = "SELECT * FROM employee";
+    var queryString = "SELECT * FROM role";
 
     connection.query(queryString, function (err, result) {
       if (err) throw err;
