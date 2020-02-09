@@ -1,18 +1,21 @@
-var inquirer = require("inquirer");
-var cTable = require("console.table");
-var orm = require("./config/orm")
+const inquirer = require("inquirer");
+const cTable = require("console.table");
+const orm = require("./config/orm")
+var connection = require("./config/connection");
 
 
 
-const start = async function () {
-    await inquirer
+const start = function () {
+    inquirer
         .prompt([{
-            type: "rawlist",
+            type: "list",
             name: "action",
             message: "What would you like to do?",
             choices: ["View All Employees", "View All Employees by Deparment", "View All Employees by Manager", "Add Employee", "Remove Employee", "Update Employee Role", "Update Employee Manager", "View All Roles", "Add Role", "Remove Role"]
-        },])
-        .then(function () {
+        }
+        ])
+        .then(function (answers) {
+            
             switch (answers.action) {
                 case "View All Employees":
                     viewAllEmployees();
@@ -57,26 +60,30 @@ const start = async function () {
         });
 };
 
-const selectAllEmployees = async function() {
-    return await orm.selectAllEmployees(function (result) {
+const selectAllEmployees = function () {
+    return orm.selectAllEmployees(function (result) {
         let data = result;
-        console.log(data);
         return data;
     });
-}
+};
 
-const selectAllRoles = async function () {
-    return await orm.selectAllRoles(function (result) {
+const selectAllRoles = function () {
+    return orm.selectAllRoles(function (result) {
+        return result;
+    });
+};
+
+const selectAllDepartments = function () {
+    return orm.selectAllDepartments(function (result) {
         let data = result;
-        console.log(data);
         return data;
     });
-}
+};
 
-const addEmployee = async function () {
-    let choices = await selectAllEmployees();
-    let roles = await selectAllRoles();
-    await inquirer
+const addEmployee = function () {
+    let choices = selectAllEmployees();
+    let roles = selectAllRoles();
+    inquirer
         .prompt([{
             type: "input",
             name: "firstname",
@@ -88,16 +95,16 @@ const addEmployee = async function () {
             message: "What is the last name?"
         },
         {
-            type: "rawlist",
+            type: "list",
             name: "role",
             message: "What is the employee's role?",
-            choices: roles
+            choices: [roles]
         },
         {
-            type: "rawlist",
+            type: "list",
             name: "manager",
             message: "Who is the employee's manager?",
-            choices: choices 
+            choices: [choices]
         },
         ])
         .then(function (answers) {
@@ -110,101 +117,110 @@ const addEmployee = async function () {
         });
 };
 
-const addDepartment = async function () {
-    await inquirer
-        .prompt({
+const addDepartment = function () {
+    inquirer
+        .prompt([{
             type: "input",
             name: "name",
             message: "What is the new department name?"
-        },
-        
-        )
+        },  
+    ])
         .then(function (answers) {
             orm.addDepartment(answers.name);
         });
 };
 
-const removeDepartment = async function () {
-    let choices = await selectAllDepartments();
-    await inquirer
+const removeDepartment = function () {
+    let choices = selectAllDepartments();
+    inquirer
         .prompt([{
             type: "list",
             name: "department",
             message: "Which department would you like to remove?",
-            choices: choices
+            choices: [choices]
         },
-        ])
-    .then(orm.deleteDepartment(answers.department))
+    ])
+        .then(function (answers) {
+            orm.deleteDepartment(answers.department);
+        })
 };
 
-const removeEmployee = async function () {
-    let choices = await selectAllEmployees();
-    await inquirer
+const removeEmployee = function () {
+    let choices = selectAllEmployees();
+    inquirer
         .prompt([{
             type: "list",
             name: "employee",
             message: "Which employee would you like to remove?",
-            choices: choices
+            choices: [choices]
         },
-        ])
-    .then(orm.deleteEmployee(answers.employee))
+    ])
+        .then(function (answers) {
+            orm.deleteEmployee(answers.employee);
+        })
 };
 
-const removeRole = async function () {
-    let choices = await selectAllRoles();
-    await inquirer
+const removeRole = function () {
+    let choices = selectAllRoles();
+    inquirer
         .prompt([{
             type: "list",
             name: "role",
             message: "Which role would you like to remove?",
-            choices: choices
+            choices: [choices]
         },
         ])
-    .then(orm.deleteRole(answers.role))
+        .then(function (answers) {
+            orm.deleteRole(answers.role);
+        })
 };
 
-const updateEmployeeRole = async function () {
+const updateEmployeeRole = function () {
     let choices = selectAllEmployees();
     let roles = selectAllRoles();
-    await inquirer
+    inquirer
         .prompt([{
-            type: "rawlist",
+            type: "list",
             name: "employee",
             message: "Which employee would you like to update the role for?",
-            choices: choices
+            choices: [choices]
         },
         {
-            type: "rawlist",
+            type: "list",
             name: "role",
             message: "Which role should it be updated to?",
-            choices: roles
+            choices: [roles]
         },
         ])
-    .then(orm.updateEmployeeRole(answers))
+        .then(function (answers) {
+            orm.updateEmployeeRole(answers);
+        })
 };
 
-const updateEmployeeManager = async function () {
+const updateEmployeeManager = function () {
     let choices = selectAllEmployees();
-    await inquirer
+    inquirer
         .prompt([{
-            type: "rawlist",
+            type: "list",
             name: "employee",
             message: "Which employee would you like to update the manager for?",
-            choices: choices
+            choices: [choices]
         },
         {
-            type: "rawlist",
+            type: "list",
             name: "manager",
             message: "Who is their new manager?",
-            choices: choices
+            choices: [choices]
         },
         ])
-    .then(orm.updateEmployeeManager(answers))
+        .then(function (answers) {
+            orm.updateEmployeeManager(answers);
+        })
 };
 
-const addRole = async function () {
-    let departments = await orm.selectAllDepartments();
-    await inquirer
+const addRole = function () {
+    let departments = selectAllDepartments();
+    inquirer
         .prompt([{
             type: "input",
             name: "role",
@@ -216,45 +232,49 @@ const addRole = async function () {
             message: "What is the salary?"
         },
         {
-            type: "rawlist",
+            type: "list",
             name: "department",
             message: "Which department does this role belong to?",
             choices: departments
         },
         ])
-    .then(orm.addRole(answers))
+        .then(function (answers) {
+            orm.addRole(answers);
+        })
 };
 
 const viewAllEmployees = function () {
+    var queryString = "SELECT * FROM employee";
+
+    connection.query(queryString, function (err, result) {
+      if (err) throw err;
+        let employees = result;
+        console.table(employees);
+    });
     
-    console.table(["Employees", orm.selectAllEmployees(function (result) {
-        let data = result;
-        console.log(data);
-        return data;
-    }
-    )]);
+    //console.table(["Employees", employees]);
 };
 
 const viewAllRoles = function () {
-    
-    console.table(["Roles", orm.selectAllRoles(function (result) {
-        let data = result;
-        console.log(data);
-        return data;
-    }
-    )]);
+    var queryString = "SELECT * FROM employee";
+
+    connection.query(queryString, function (err, result) {
+      if (err) throw err;
+        let roles = result;
+        console.table(roles);
+    });
 };
 
 const viewAllDepartments = function () {
+    var queryString = "SELECT * FROM department";
+
+    connection.query(queryString, function (err, result) {
+      if (err) throw err;
+        let departments = result;
+        console.table(["Departments", departments]);
+    });
+
     
-    console.table(["Departments", orm.selectAllDepartments(function (result) {
-        let data = result;
-        console.log(data);
-        return data;
-    }
-    )]);
 };
 
 start();
-
-removeEmployee();
