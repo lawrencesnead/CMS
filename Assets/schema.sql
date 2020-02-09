@@ -1,14 +1,14 @@
 
 
 -- Drops the db if it already exists --
-DROP DATABASE IF EXISTS db;
+DROP DATABASE IF EXISTS employee_db;
 -- Create the database db and specified it for use.
-CREATE DATABASE db;
+CREATE DATABASE employee_db;
 
-USE db;
+USE employee_db;
 
 -- Create the tables.
-CREATE TABLE departments (
+CREATE TABLE department (
   id int NOT NULL AUTO_INCREMENT,
   name varchar(30) NOT NULL,
   PRIMARY KEY (id)
