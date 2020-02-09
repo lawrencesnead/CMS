@@ -2,7 +2,7 @@ var inquirer = require("inquirer");
 var cTable = require("console.table");
 var orm = require("./config/orm")
 
-let employees = orm.selectAllEmployees();
+
 
 const start = async function () {
     await inquirer
@@ -32,8 +32,10 @@ const start = async function () {
                 case "Update Employee Manager":
                     break;
                 case "View All Roles":
+                    viewAllRoles();
                     break;
                 case "View All Departments":
+                    viewAllDepartments();
                     break;
                 case "Add Role":
                     addRole();
@@ -60,7 +62,8 @@ const selectAllEmployees = async function() {
         return data;
     });
 }
-const selectAllRoles = async function() {
+
+const selectAllRoles = async function () {
     return await orm.selectAllRoles(function (result) {
         let data = result;
         console.log(data);
@@ -105,6 +108,22 @@ const addEmployee = async function () {
         });
 };
 
+const addDepartment = async function () {
+    let choices = await selectAllEmployees();
+    let roles = await selectAllRoles();
+    await inquirer
+        .prompt({
+            type: "input",
+            name: "name",
+            message: "What is the new department name?"
+        },
+        
+        )
+        .then(function (answers) {
+            orm.addDepartment(answers.name);
+        });
+};
+
 const removeEmployee = async function () {
     let choices = await selectAllEmployees();
     await inquirer
@@ -141,14 +160,37 @@ const addRole = async function () {
     .then(orm.addRole(answers))
 };
 
-const viewAllEmployees = async function () {
+
+const viewAllEmployees = function () {
     
-    console.table(["Employees", orm.selectAllEmployees(orm.selectAllEmployees(function (result) {
+    console.table(["Employees", orm.selectAllEmployees(function (result) {
         let data = result;
         console.log(data);
         return data;
     }
-    ))]);
+    )]);
 };
+
+const viewAllRoles = function () {
+    
+    console.table(["Roles", orm.selectAllRoles(function (result) {
+        let data = result;
+        console.log(data);
+        return data;
+    }
+    )]);
+};
+
+const viewAllDepartments = function () {
+    
+    console.table(["Departments", orm.selectAllDepartments(function (result) {
+        let data = result;
+        console.log(data);
+        return data;
+    }
+    )]);
+};
+
 start();
+
 removeEmployee();

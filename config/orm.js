@@ -37,36 +37,49 @@ var orm = {
       selection(result);
     });
   },
+  
   deleteEmployee: function (person) {
-    var queryString = "SELECT * FROM employee WHERE employee.id = ??";
+    var queryString = "DELETE FROM employee WHERE employee.id = ??";
 
     connection.query(queryString, [person.id], function (err, result) {
       if (err) throw err;
-      console.log(employee.id + " has been removed!")
+      console.log(result.affectedRows + " has been removed!")
     });
   },
+  
   addRole: function (role) {
     var queryString = `INSERT INTO role (title, salary, department) VALUES (??, ??, ??)`;
 
     connection.query(queryString, [role.title, role.salary, role.department], function (err, result) {
       if (err) throw err;
-      console.log(role.titie + " has been added!");
+      console.log(result.affectedRows + " role has been added!");
     });
   },
+
+  addDepartment: function (department) {
+    var queryString = `INSERT INTO department (name) VALUES (??)`;
+
+    connection.query(queryString, [department], function (err, result) {
+      if (err) throw err;
+      console.log(result.affectedRows + " deparment has been added!");
+    });
+  },
+  
   addEmployee: function (employee) {
     var queryString = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (??, ??, ??, ??)`;
 
-    connection.query(queryString, [employee.firstname, employee.lastname, employee.role, employee.manager.id], function (err, result) {
+    connection.query(queryString, [employee.firstname, employee.lastname, employee.role_id, employee.manager_id], function (err, result) {
       if (err) throw err;
-      console.log(employee.firstname + " has been added!");
+      console.log(result + " employee has been added!");
     });
   },
+  
   getID: function (employee) {
     let fullName = employee.split(" ");
     var queryString = `SELECT * FROM employee WHERE employee.first_name = ?? && employee.last_name = ??`
     connection.query(queryString, [fullName[0], fullName[1]], function (err, result) {
       if (err) throw err;
-      console.log(employee.firstname + " has been added!");
+      console.log(result + " id");
     });
   }
 };
