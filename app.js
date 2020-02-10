@@ -6,6 +6,7 @@ var connection = require("./config/connection");
 
 
 
+
 const start = function () {
     inquirer
         .prompt([{
@@ -61,6 +62,21 @@ const start = function () {
         });
 };
 
+const roleTitleParse = function (data) {
+    let result = [];
+    for (let i = 0; i < data.length; i++) {
+        result.push({ name: String(data[i].title), value: String(data[i].id )});
+    }
+    return result;
+};
+const nameParse = function (data) {
+    let result = [];
+    for (let i = 0; i < data.length; i++) {
+        result.push({ name: String(data[i].first_name + " " + data[i].last_name), value: String(data[i].id )});
+    }
+    return result;
+};
+
 const selectAllEmployees = function () {
     return orm.selectAllEmployees(function (result) {
         let data = result;
@@ -81,24 +97,26 @@ const selectAllDepartments = function () {
     });
 };
 
-const addEmployee =  function () {
+const addEmployee = function () {
     var queryString = "SELECT * FROM employee";
     let employees, roles;
     
-    connection.query(queryString, function (err, result) {
-        if (err) throw err;
-        employees = result.forEach(employee => employee.first_name + " " + employee.last_name);
-        console.log(employees);
+        connection.query(queryString, function (err, result) {
+            if (err) throw err;
+            //Object.keys(result).forEach(key => console.log(key, result[key]));
+            employees = nameParse(result);
+            //console.log(employees);
         
-    });
+        });
     
-    var queryString2 = "SELECT * FROM role AS role";
+        var queryString2 = "SELECT * FROM role AS role";
     
-    connection.query(queryString2, function (err, result) {
-      if (err) throw err;
-        roles = result.forEach(role => role.title);
-        console.log(roles);
-    });
+        connection.query(queryString2, function (err, result) {
+            if (err) throw err;
+            roles = roleTitleParse(result);
+            //console.log(roles);
+        });
+    
     inquirer
         .prompt([{
             type: "input",
@@ -114,19 +132,19 @@ const addEmployee =  function () {
                 type: "list",
                 name: "role",
                 message: "What is the employee's role?",
-                choices: [{roles}]
+                choices: [`${ roles }`]
         },
         {
             type: "list",
             name: "manager",
             message: "Who is the employee's manager?",
-            choices: [{ employees }]
+            choices: [`${ employees }`]
         },
         ])
         .then(function (answers) {
             let employee = {
-                "first_name": answers.firstname, "last_name": answers.lastnamew,
-                "manager_id": answers.manager.id, "role_id": answers.role.id 
+                first_name: ''+answers.firstname+'', last_name: ''+answers.lastname+'',
+                manager_id: ''+answers.manager.id+'', role_id: ''+answers.role.id+'' 
             };
 
             orm.addEmployee(employee);

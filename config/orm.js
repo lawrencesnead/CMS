@@ -39,9 +39,9 @@ var orm = {
   },
   
   addEmployee: function (employee) {
-    var queryString = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (??, ??, ??, ??)`;
+    var queryString = "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (??, ??, ??, ??)";
 
-    connection.query(queryString, [employee.firstname, employee.lastname, employee.role_id, employee.manager_id], function (err, result) {
+    connection.query(queryString, [employee.first_name, employee.last_name, employee.role_id, employee.manager_id], function (err, result) {
       if (err) throw err;
       console.log(result.affectedRows + " employee has been added here!");
     });
